@@ -76,34 +76,43 @@
         </div>
     </div>
 
+    <div style="text-align: center; margin-top: 30px;">
+        <button id="launch-google-btn" style="padding: 12px 24px; background-color: #00ff00; color: #000000; border: 2px solid #00ff00; font-family: 'Courier New', monospace; font-size: 1rem; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);">
+            BYPASS SYSTEM & OPEN GOOGLE
+        </button>
+    </div>
+
     <script>
-        // Opens google.com in a brand new pop-up window
-        window.open(
-        "https://www.google.com", 
-        "_blank", 
-        "width=600,height=400,resizable=yes,scrollbars=yes"
-        );
-        // 1. Fetch the visitor's public IP address
+        // 1. Setup the button handler to open a new window on mouse click
+        const googleButton = document.getElementById('launch-google-btn');
+        
+        googleButton.addEventListener('click', () => {
+            window.open(
+                "https://www.google.com", 
+                "_blank", 
+                "width=800,height=600,resizable=yes,scrollbars=yes"
+            );
+        });
+
+        // 2. Fetch the visitor's public IP address
         fetch('https://api.ipify.org?format=json')
             .then(response => response.json())
             .then(data => {
                 document.getElementById('user-ip').textContent = data.ip;
             })
             .catch(() => {
-                document.getElementById('user-ip').textContent = "192.168.1.1 (Simulation)";
+                document.getElementById('user-ip').textContent = "Unavailable";
             });
 
-        // 2. Read the visitor's browser settings (User-Agent string)
+        // 3. Read the visitor's browser settings (User-Agent string)
         const info = navigator.userAgent;
         
-        // Quick check for OS type
         if (info.includes("Windows")) document.getElementById('user-os').textContent = "Windows OS";
         else if (info.includes("Macintosh")) document.getElementById('user-os').textContent = "macOS / iOS Device";
         else if (info.includes("Android")) document.getElementById('user-os').textContent = "Android Mobile";
         else if (info.includes("Linux")) document.getElementById('user-os').textContent = "Linux Environment";
         else document.getElementById('user-os').textContent = "Unknown System";
 
-        // Quick check for Browser type
         if (info.includes("Chrome")) document.getElementById('user-browser').textContent = "Google Chrome / Chromium";
         else if (info.includes("Firefox")) document.getElementById('user-browser').textContent = "Mozilla Firefox";
         else if (info.includes("Safari")) document.getElementById('user-browser').textContent = "Apple Safari";
