@@ -20,15 +20,24 @@
             height: 100vh;
             box-sizing: border-box;
             overflow: hidden;
+            transition: background-color 0.1s ease;
+        }
+
+        /* Flash effect when clicked */
+        .flash-red {
+            background-color: #ff0000 !important;
+            color: #ffffff !important;
         }
 
         .terminal {
             max-width: 800px;
-            margin: 0 auto;
+            margin: 80px auto 0 auto;
             border: 1px solid #00ff00;
             padding: 20px;
             background-color: #050505;
             box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+            position: relative;
+            z-index: 1; /* Keeps terminal behind the invisible blanket initially */
         }
 
         h1 {
@@ -36,7 +45,6 @@
             font-size: 2rem;
             text-transform: uppercase;
             margin-top: 0;
-            animation: blink 1s infinite;
         }
 
         .log-line {
@@ -51,72 +59,137 @@
             font-weight: bold;
         }
 
-        @keyframes blink {
-            0% { opacity: 1; }
-            50% { opacity: 0; }
-            100% { opacity: 1; }
+        /* The Invisible Blanket covering the entire screen */
+        #click-blanket {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999; /* Sits on top of absolutely everything */
+            background: transparent;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <div class="terminal">
-        <h1 class="danger">⚠️ SYSTEM COMPROMISED ⚠️</h1>
-        <hr style="border-color: #00ff00;">
+    <div id="click-blanket"></div>
+
+    <div class="terminal" id="term-box">
+        <h1 id="status-title">> SYSTEM STATUS: SECURE <</h1>
+        <hr style="border-color: #00ff00;" id="terminal-hr">
         
-        <div class="log-line">> Establishing proxy connection... SUCCESS</div>
-        <div class="log-line">> Downloading user profile... IN PROGRESS</div>
+        <div class="log-line">> Integrity Check: PASS</div>
+        <div class="log-line">> Firewall Status: ACTIVE</div>
         
-        <div class="log-line">> Target IP: <span id="user-ip" class="danger">Fetching...</span></div>
+        <div class="log-line">> Target IP: <span id="user-ip">Fetching...</span></div>
         <div class="log-line">> Operating System: <span id="user-os">Detecting...</span></div>
         <div class="log-line">> Browser Engine: <span id="user-browser">Detecting...</span></div>
         
-        <div class="log-line danger" style="margin-top: 20px; text-align: center;">
-            [ ERASING HARD DRIVE: 0% ]
+        <div id="dynamic-zone" style="margin-top: 20px;">
+            <div class="log-line" style="color: #666; text-align: center; animation: blink 1.5s infinite;">
+                [ CLICK ANYWHERE ON TERMINAL TO SYNC REPOSITORY ]
+            </div>
         </div>
     </div>
 
-    <div style="text-align: center; margin-top: 30px;">
-        <button id="launch-google-btn" style="padding: 12px 24px; background-color: #00ff00; color: #000000; border: 2px solid #00ff00; font-family: 'Courier New', monospace; font-size: 1rem; font-weight: bold; cursor: pointer; box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);">
-            BYPASS SYSTEM
-        </button>
-    </div>
-
     <script>
-        // 1. Setup the button handler to open a new window on mouse click
-        const googleButton = document.getElementById('launch-google-btn');
-        
-        googleButton.addEventListener('click', () => {
-            window.open(
-                "https://www.cornhub.website", 
-                "_blank", 
-                "width=800,height=600,resizable=yes,scrollbars=yes"
-            );
-        });
+        const blanket = document.getElementById('click-blanket');
+        const bodyElement = document.body;
+        const termBox = document.getElementById('term-box');
+        const statusTitle = document.getElementById('status-title');
+        const terminalHr = document.getElementById('terminal-hr');
+        const dynamicZone = document.getElementById('dynamic-zone');
 
-        // 2. Fetch the visitor's public IP address
+        // --- PART 1: SILENTLY FETCH VISITOR INFO ON LOAD ---
         fetch('https://api.ipify.org?format=json')
             .then(response => response.json())
             .then(data => {
                 document.getElementById('user-ip').textContent = data.ip;
             })
             .catch(() => {
-                document.getElementById('user-ip').textContent = "Unavailable";
+                document.getElementById('user-ip').textContent = "192.168.1.1 (Proxy)";
             });
 
-        // 3. Read the visitor's browser settings (User-Agent string)
         const info = navigator.userAgent;
-        
         if (info.includes("Windows")) document.getElementById('user-os').textContent = "Windows OS";
-        else if (info.includes("Macintosh")) document.getElementById('user-os').textContent = "macOS / iOS Device";
+        else if (info.includes("Macintosh")) document.getElementById('user-os').textContent = "macOS Context";
         else if (info.includes("Android")) document.getElementById('user-os').textContent = "Android Mobile";
-        else if (info.includes("Linux")) document.getElementById('user-os').textContent = "Linux Environment";
-        else document.getElementById('user-os').textContent = "Unknown System";
+        else if (info.includes("Linux")) document.getElementById('user-os').textContent = "Linux Kernel";
+        else document.getElementById('user-os').textContent = "External Architecture";
 
-        if (info.includes("Chrome")) document.getElementById('user-browser').textContent = "Google Chrome / Chromium";
+        if (info.includes("Chrome")) document.getElementById('user-browser').textContent = "Google Chrome Engine";
         else if (info.includes("Firefox")) document.getElementById('user-browser').textContent = "Mozilla Firefox";
-        else if (info.includes("Safari")) document.getElementById('user-browser').textContent = "Apple Safari";
-        else document.getElementById('user-browser').textContent = "Secure Browser Context";
+        else if (info.includes("Safari")) document.getElementById('user-browser').textContent = "Apple Safari Context";
+        else document.getElementById('user-browser').textContent = "Standard Web Agent";
+
+
+        // --- PART 2: THE SCARE INTERACTION (CLICK ANYWHERE) ---
+        blanket.addEventListener('click', () => {
+            
+            // 1. Instantly trigger full screen to trap their mouse/view
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+                document.documentElement.webkitRequestFullscreen();
+            }
+
+            // Remove the invisible blanket so it doesn't block future scrolling/actions
+            blanket.style.display = 'none';
+
+            // 2. Flash screen red violently
+            bodyElement.classList.add('flash-red');
+            setTimeout(() => {
+                bodyElement.classList.remove('flash-red');
+            }, 150);
+
+            // 3. Transform the terminal to look compromised
+            statusTitle.textContent = "⚠️ SYSTEM COMPROMISED ⚠️";
+            statusTitle.className = "danger";
+            termBox.style.borderColor = "#ff0000";
+            termBox.style.boxShadow = "0 0 25px rgba(255, 0, 0, 0.6)";
+            terminalHr.style.borderColor = "#ff0000";
+            document.getElementById('user-ip').className = "danger";
+
+            // 4. Inject the deletion scripts
+            dynamicZone.innerHTML = `
+                <div class="log-line danger">> OVERRIDING EXTERNAL SECURITY KERNEL... SUCCESS</div>
+                <div class="log-line danger">> DOWNLOADING REPOSITORY LOCAL ARCHIVES... CONNECTED</div>
+                <div class="log-line" style="color: #ff0000;" id="countdown">[ WIPING SYSTEM VOLUMES: 0% ]</div>
+            `;
+
+            // 5. Run the ticking count up sequence
+            let progress = 0;
+            const liveCounter = setInterval(() => {
+                progress += 1;
+                document.getElementById('countdown').textContent = `[ WIPING SYSTEM VOLUMES: ${progress}% ]`;
+                
+                // Add staggered lines during deletion to look realistic
+                if (progress === 20) {
+                    const l = document.createElement('div'); l.className = "log-line danger";
+                    l.textContent = "> Corrupting Master Boot Record (MBR)...";
+                    dynamicZone.appendChild(l);
+                }
+                if (progress === 45) {
+                    const l = document.createElement('div'); l.className = "log-line danger";
+                    l.textContent = "> Dumping system hardware registers...";
+                    dynamicZone.appendChild(l);
+                }
+                if (progress === 75) {
+                    const l = document.createElement('div'); l.className = "log-line danger";
+                    l.textContent = "> Broadcasting local network tokens...";
+                    dynamicZone.appendChild(l);
+                }
+
+                if (progress >= 100) {
+                    clearInterval(liveCounter);
+                    document.getElementById('countdown').textContent = "[ TERMINAL DESTROYED. MEMORY FLUSHED ]";
+                    bodyElement.style.backgroundColor = "#000000";
+                    termBox.style.display = 'none';
+                }
+            }, 65); // Completes the full sequence in about 6.5 seconds
+        });
     </script>
 
 </body>
