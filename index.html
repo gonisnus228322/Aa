@@ -86,21 +86,18 @@
             cursor: pointer;
         }
 
-        /* --- WINDOWS 11 FLUENT DESIGN COMPONENT --- */
+        /* --- WINDOWS 11 STYLING ARCHITECTURE --- */
         .win11-window {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 450px;
+            width: 420px;
             background-color: #f3f3f3;
             border: 1px solid #d0d0d0;
-            border-radius: 8px; /* Win11 characteristic rounded corners */
+            border-radius: 8px;
             color: #000000;
             font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-            box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.35);
+            box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.4);
             z-index: 5000;
-            display: none;
+            display: none; /* Hidden initially */
             overflow: hidden;
             user-select: none;
         }
@@ -117,12 +114,6 @@
             border-bottom: 1px solid #e5e5e5;
         }
 
-        .win11-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
         .win11-controls {
             display: flex;
             height: 100%;
@@ -135,10 +126,6 @@
             justify-content: center;
             align-items: center;
             font-size: 14px;
-            transition: background-color 0.1s;
-        }
-        .win11-btn:hover {
-            background-color: #e5e5e5;
         }
         .win11-btn.close-btn:hover {
             background-color: #e81123;
@@ -146,38 +133,33 @@
         }
 
         .win11-body {
-            padding: 24px;
-            background-color: #f3f3f3;
+            padding: 20px;
             display: flex;
             gap: 16px;
             align-items: flex-start;
         }
 
         .win11-icon {
-            font-size: 32px;
+            font-size: 28px;
             color: #cc0000;
         }
 
-        .win11-text {
-            flex: 1;
-        }
-
         .win11-text h2 {
-            margin: 0 0 8px 0;
-            font-size: 15px;
+            margin: 0 0 6px 0;
+            font-size: 14px;
             font-weight: 600;
             color: #1a1a1a;
         }
 
         .win11-text p {
             margin: 0;
-            font-size: 13px;
+            font-size: 12.5px;
             color: #505050;
             line-height: 1.4;
         }
 
         .win11-footer {
-            padding: 12px 24px;
+            padding: 10px 20px;
             background-color: #eeeeee;
             display: flex;
             justify-content: flex-end;
@@ -185,18 +167,12 @@
         }
 
         .win11-action-btn {
-            padding: 6px 20px;
+            padding: 4px 18px;
             background-color: #ffffff;
             border: 1px solid #cccccc;
-            border-bottom: 1px solid #b3b3b3;
             border-radius: 4px;
-            font-size: 13px;
-            font-family: inherit;
+            font-size: 12px;
             cursor: pointer;
-        }
-        .win11-action-btn:hover {
-            background-color: #f9f9f9;
-            border-color: #bbbbbb;
         }
     </style>
 </head>
@@ -204,28 +180,7 @@
 
     <div id="click-blanket"></div>
 
-    <div id="win11-alert" class="win11-window">
-        <div class="win11-header">
-            <div class="win11-title">
-                <span>Windows Security</span>
-            </div>
-            <div class="win11-controls">
-                <div class="win11-btn">‒</div>
-                <div class="win11-btn">⎅</div>
-                <div class="win11-btn close-btn">✕</div>
-            </div>
-        </div>
-        <div class="win11-body">
-            <div class="win11-icon">⚠️</div>
-            <div class="win11-text">
-                <h2>Threat containment failure</h2>
-                <p>The system has encountered an unhandled exception processing external repository scripts. Memory registers are clearing automatically.</p>
-            </div>
-        </div>
-        <div class="win11-footer">
-            <button class="win11-action-btn">OK</button>
-        </div>
-    </div>
+    <div id="window-factory"></div>
 
     <div class="terminal" id="term-box">
         <h1 id="status-title">> SYSTEM STATUS: SECURE <</h1>
@@ -252,9 +207,9 @@
         const statusTitle = document.getElementById('status-title');
         const terminalHr = document.getElementById('terminal-hr');
         const dynamicZone = document.getElementById('dynamic-zone');
-        const win11Alert = document.getElementById('win11-alert');
+        const factory = document.getElementById('window-factory');
 
-        // Fetch infrastructure details
+        // Fetch network configurations
         fetch('https://api.ipify.org?format=json')
             .then(response => response.json())
             .then(data => {
@@ -276,7 +231,72 @@
         else if (info.includes("Safari")) document.getElementById('user-browser').textContent = "Apple Safari Agent";
         else document.getElementById('user-browser').textContent = "Webkit Context";
 
-        // --- INTERACTION TRIGGER ---
+        // Array of unique scary alert contents
+        const errorTemplates = [
+            { title: "Windows Security", heading: "Threat containment failure", msg: "An unhandled background process has requested immediate memory reallocation." },
+            { title: "System Kernel Alert", heading: "Bypass Block Detected", msg: "External repository data injection detected on sector 0x000F8A32." },
+            { title: "Microsoft Account", heading: "Credential extraction warning", msg: "Local browser database tokens are sync-transferring to an unauthorized proxy domain." },
+            { title: "BitLocker Drive Encryption", heading: "Encryption initialization", msg: "Security keys are being rewritten. System files will lock automatically on reboot." },
+            { title: "Critical System Process", heading: "lsass.exe - Terminated", msg: "The system will now force memory cache flushes. Hardware volumes unreadable." }
+        ];
+
+        // Active tracking arrays to clear movement loops later
+        let physicsLoops = [];
+
+        // Function that builds and launches a moving Windows 11 window
+        function spawnWindow(data, index) {
+            const win = document.createElement('div');
+            win.className = 'win11-window';
+            win.style.display = 'block';
+            
+            // Stagger their initial placement locations across the monitor
+            let posX = (window.innerWidth / 2 - 210) + (index * 30) - 60;
+            let posY = (window.innerHeight / 2 - 100) + (index * 25) - 50;
+            win.style.left = posX + 'px';
+            win.style.top = posY + 'px';
+
+            win.innerHTML = `
+                <div class="win11-header">
+                    <span>${data.title}</span>
+                    <div class="win11-controls"><div class="win11-btn close-btn">✕</div></div>
+                </div>
+                <div class="win11-body">
+                    <div class="win11-icon">⚠️</div>
+                    <div class="win11-text">
+                        <h2>${data.heading}</h2>
+                        <p>${data.msg}</p>
+                    </div>
+                </div>
+                <div class="win11-footer"><button class="win11-action-btn">OK</button></div>
+            `;
+
+            factory.appendChild(win);
+
+            // Assign unique movement speeds and trajectories to each independent window
+            let dx = (index % 2 === 0 ? 5 : -5) + (index * 0.5);
+            let dy = (index % 3 === 0 ? 4 : -4) - (index * 0.5);
+
+            const interval = setInterval(() => {
+                posX += dx;
+                posY += dy;
+
+                // Bounce off left/right screen limits
+                if (posX + 420 >= window.innerWidth || posX <= 0) {
+                    dx = -dx;
+                }
+                // Bounce off top/bottom screen limits
+                if (posY + 160 >= window.innerHeight || posY <= 0) {
+                    dy = -dy;
+                }
+
+                win.style.left = posX + 'px';
+                win.style.top = posY + 'px';
+            }, 16);
+
+            physicsLoops.push(interval);
+        }
+
+        // --- THE INTERACTION SCARE TRIGGER ---
         blanket.addEventListener('click', () => {
             
             if (document.documentElement.requestFullscreen) {
@@ -305,66 +325,40 @@
             `;
 
             let progress = 0;
-            let moveInterval;
 
             const liveCounter = setInterval(() => {
                 progress += 1;
                 document.getElementById('countdown').textContent = `[ PURGING VOLUMES: ${progress}% ]`;
                 
-                // Show the window early on
-                if (progress === 10) {
-                    win11Alert.style.display = 'block';
-                    
-                    // Remove translate centering so coordinates calculations work correctly
-                    win11Alert.style.transform = 'none';
-                    
-                    // Set initial coordinates near the center
-                    let posX = window.innerWidth / 2 - 225;
-                    let posY = window.innerHeight / 2 - 100;
-                    
-                    // Speed vectors for movement direction
-                    let dx = 7;
-                    let dy = 5;
+                // Stagger-spawn fake windows at 10%, 20%, 30%, 40%, and 50% progress
+                if (progress === 10) spawnWindow(errorTemplates[0], 0);
+                if (progress === 22) spawnWindow(errorTemplates[1], 1);
+                if (progress === 34) spawnWindow(errorTemplates[2], 2);
+                if (progress === 46) spawnWindow(errorTemplates[3], 3);
+                if (progress === 58) spawnWindow(errorTemplates[4], 4);
 
-                    // Continuous movement engine loop (Bounces around the viewport boundaries)
-                    moveInterval = setInterval(() => {
-                        posX += dx;
-                        posY += dy;
-
-                        // Check bounce conditions for X boundary
-                        if (posX + 450 >= window.innerWidth || posX <= 0) {
-                            dx = -dx;
-                        }
-                        // Check bounce conditions for Y boundary
-                        if (posY + 200 >= window.innerHeight || posY <= 0) {
-                            dy = -dy;
-                        }
-
-                        win11Alert.style.left = posX + 'px';
-                        win11Alert.style.top = posY + 'px';
-                    }, 16); // ~60 frames per second smooth pathing
-                }
-
-                if (progress === 35) {
+                if (progress === 40) {
                     const l = document.createElement('div'); l.className = "log-line danger";
-                    l.textContent = "> Wiping motherboard MBR partition charts...";
+                    l.textContent = "> Overriding kernel protection schemas...";
                     dynamicZone.appendChild(l);
                 }
-                if (progress === 65) {
+                if (progress === 70) {
                     const l = document.createElement('div'); l.className = "log-line danger";
-                    l.textContent = "> Broadcasting system data streams to local nodes...";
+                    l.textContent = "> Transferring captured browser hashes...";
                     dynamicZone.appendChild(l);
                 }
 
                 if (progress >= 100) {
                     clearInterval(liveCounter);
-                    clearInterval(moveInterval);
+                    // Halt all bouncing loops cleanly at the end
+                    physicsLoops.forEach(loop => clearInterval(loop));
+                    
                     document.getElementById('countdown').textContent = "[ MEMORY STRIPPED. STORAGE UNREADABLE ]";
                     bodyElement.style.backgroundColor = "#000000";
                     termBox.style.display = 'none';
-                    win11Alert.style.display = 'none';
+                    factory.innerHTML = ''; // Delete all spawned windows instantly
                 }
-            }, 75); 
+            }, 80); 
         });
     </script>
 
