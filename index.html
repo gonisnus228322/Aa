@@ -86,7 +86,7 @@
             cursor: pointer;
         }
 
-        /* --- WINDOWS 11 STYLING ARCHITECTURE --- */
+        /* --- MODERN WINDOWS 11 WINDOW ARCHITECTURE --- */
         .win11-window {
             position: fixed;
             width: 420px;
@@ -97,9 +97,24 @@
             font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
             box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.4);
             z-index: 5000;
-            display: none; /* Hidden initially */
             overflow: hidden;
             user-select: none;
+            
+            /* Windows 11 Native Opening Animation Spark */
+            animation: win11Open 0.25s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+            opacity: 0;
+        }
+
+        /* The custom physics scale-up pathing matching Fluent OS curves */
+        @keyframes win11Open {
+            0% {
+                transform: scale(0.85);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
         .win11-header {
@@ -209,7 +224,7 @@
         const dynamicZone = document.getElementById('dynamic-zone');
         const factory = document.getElementById('window-factory');
 
-        // Fetch network configurations
+        // Fetch user data metrics
         fetch('https://api.ipify.org?format=json')
             .then(response => response.json())
             .then(data => {
@@ -231,7 +246,6 @@
         else if (info.includes("Safari")) document.getElementById('user-browser').textContent = "Apple Safari Agent";
         else document.getElementById('user-browser').textContent = "Webkit Context";
 
-        // Array of unique scary alert contents
         const errorTemplates = [
             { title: "Windows Security", heading: "Threat containment failure", msg: "An unhandled background process has requested immediate memory reallocation." },
             { title: "System Kernel Alert", heading: "Bypass Block Detected", msg: "External repository data injection detected on sector 0x000F8A32." },
@@ -240,18 +254,20 @@
             { title: "Critical System Process", heading: "lsass.exe - Terminated", msg: "The system will now force memory cache flushes. Hardware volumes unreadable." }
         ];
 
-        // Active tracking arrays to clear movement loops later
         let physicsLoops = [];
 
-        // Function that builds and launches a moving Windows 11 window
+        // Engine that drops windows on screen with unique animation scales and audio beats
         function spawnWindow(data, index) {
+            // Play error sound cleanly on launch using your specific filename
+            const audio = new Audio('windows-11-error-sound.mp3');
+            audio.volume = 0.8;
+            audio.play().catch(e => console.log("Audio play blocked until interaction."));
+
             const win = document.createElement('div');
             win.className = 'win11-window';
-            win.style.display = 'block';
             
-            // Stagger their initial placement locations across the monitor
-            let posX = (window.innerWidth / 2 - 210) + (index * 30) - 60;
-            let posY = (window.innerHeight / 2 - 100) + (index * 25) - 50;
+            let posX = (window.innerWidth / 2 - 210) + (index * 40) - 80;
+            let posY = (window.innerHeight / 2 - 100) + (index * 30) - 60;
             win.style.left = posX + 'px';
             win.style.top = posY + 'px';
 
@@ -272,22 +288,16 @@
 
             factory.appendChild(win);
 
-            // Assign unique movement speeds and trajectories to each independent window
-            let dx = (index % 2 === 0 ? 5 : -5) + (index * 0.5);
-            let dy = (index % 3 === 0 ? 4 : -4) - (index * 0.5);
+            let dx = (index % 2 === 0 ? 4 : -4) + (index * 0.4);
+            let dy = (index % 3 === 0 ? 3 : -3) - (index * 0.4);
 
+            // Bouncing logic runs perfectly alongside animation scaling
             const interval = setInterval(() => {
                 posX += dx;
                 posY += dy;
 
-                // Bounce off left/right screen limits
-                if (posX + 420 >= window.innerWidth || posX <= 0) {
-                    dx = -dx;
-                }
-                // Bounce off top/bottom screen limits
-                if (posY + 160 >= window.innerHeight || posY <= 0) {
-                    dy = -dy;
-                }
+                if (posX + 420 >= window.innerWidth || posX <= 0) dx = -dx;
+                if (posY + 160 >= window.innerHeight || posY <= 0) dy = -dy;
 
                 win.style.left = posX + 'px';
                 win.style.top = posY + 'px';
@@ -296,9 +306,8 @@
             physicsLoops.push(interval);
         }
 
-        // --- THE INTERACTION SCARE TRIGGER ---
+        // --- TRIGGER SECTOR ---
         blanket.addEventListener('click', () => {
-            
             if (document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen();
             } else if (document.documentElement.webkitRequestFullscreen) {
@@ -326,23 +335,24 @@
 
             let progress = 0;
 
+            // Ticking speed is slowed down to give the windows more screen-time before blacking out
             const liveCounter = setInterval(() => {
                 progress += 1;
                 document.getElementById('countdown').textContent = `[ PURGING VOLUMES: ${progress}% ]`;
                 
-                // Stagger-spawn fake windows at 10%, 20%, 30%, 40%, and 50% progress
-                if (progress === 10) spawnWindow(errorTemplates[0], 0);
-                if (progress === 22) spawnWindow(errorTemplates[1], 1);
-                if (progress === 34) spawnWindow(errorTemplates[2], 2);
-                if (progress === 46) spawnWindow(errorTemplates[3], 3);
-                if (progress === 58) spawnWindow(errorTemplates[4], 4);
+                // Stagger out the animated sound windows across the timeline
+                if (progress === 8) spawnWindow(errorTemplates[0], 0);
+                if (progress === 18) spawnWindow(errorTemplates[1], 1);
+                if (progress === 28) spawnWindow(errorTemplates[2], 2);
+                if (progress === 38) spawnWindow(errorTemplates[3], 3);
+                if (progress === 48) spawnWindow(errorTemplates[4], 4);
 
-                if (progress === 40) {
+                if (progress === 30) {
                     const l = document.createElement('div'); l.className = "log-line danger";
                     l.textContent = "> Overriding kernel protection schemas...";
                     dynamicZone.appendChild(l);
                 }
-                if (progress === 70) {
+                if (progress === 65) {
                     const l = document.createElement('div'); l.className = "log-line danger";
                     l.textContent = "> Transferring captured browser hashes...";
                     dynamicZone.appendChild(l);
@@ -350,15 +360,14 @@
 
                 if (progress >= 100) {
                     clearInterval(liveCounter);
-                    // Halt all bouncing loops cleanly at the end
                     physicsLoops.forEach(loop => clearInterval(loop));
                     
                     document.getElementById('countdown').textContent = "[ MEMORY STRIPPED. STORAGE UNREADABLE ]";
                     bodyElement.style.backgroundColor = "#000000";
                     termBox.style.display = 'none';
-                    factory.innerHTML = ''; // Delete all spawned windows instantly
+                    factory.innerHTML = ''; 
                 }
-            }, 80); 
+            }, 180); 
         });
     </script>
 
