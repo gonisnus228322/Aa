@@ -86,7 +86,7 @@
             cursor: pointer;
         }
 
-        /* --- MODERN WINDOWS 11 WINDOW ARCHITECTURE --- */
+        /* --- MODERN WINDOWS 11 WINDOW ARCHITECTURE WITH SUITE ANIMATIONS --- */
         .win11-window {
             position: fixed;
             width: 420px;
@@ -100,21 +100,27 @@
             overflow: hidden;
             user-select: none;
             
-            /* Windows 11 Native Opening Animation Spark */
-            animation: win11Open 0.25s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+            /* Windows 11 Fluent Opening Animation */
+            animation: win11Open 0.22s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
             opacity: 0;
+            transition: opacity 0.15s, transform 0.15s;
         }
 
-        /* The custom physics scale-up pathing matching Fluent OS curves */
         @keyframes win11Open {
             0% {
-                transform: scale(0.85);
+                transform: scale(0.82);
                 opacity: 0;
             }
             100% {
                 transform: scale(1);
                 opacity: 1;
             }
+        }
+
+        /* Closing smooth scale-down effect class */
+        .win11-closing {
+            transform: scale(0.9) !important;
+            opacity: 0 !important;
         }
 
         .win11-header {
@@ -141,6 +147,10 @@
             justify-content: center;
             align-items: center;
             font-size: 14px;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+        .win11-btn:hover {
+            background-color: #e5e5e5;
         }
         .win11-btn.close-btn:hover {
             background-color: #e81123;
@@ -182,12 +192,21 @@
         }
 
         .win11-action-btn {
-            padding: 4px 18px;
+            padding: 5px 22px;
             background-color: #ffffff;
             border: 1px solid #cccccc;
             border-radius: 4px;
             font-size: 12px;
+            font-family: inherit;
             cursor: pointer;
+            transition: background-color 0.1s ease, border-color 0.1s ease;
+        }
+        .win11-action-btn:hover {
+            background-color: #f5f5f5;
+            border-color: #999999;
+        }
+        .win11-action-btn:active {
+            background-color: #e5e5e5;
         }
     </style>
 </head>
@@ -224,7 +243,7 @@
         const dynamicZone = document.getElementById('dynamic-zone');
         const factory = document.getElementById('window-factory');
 
-        // Fetch user data metrics
+        // Fetch network configurations
         fetch('https://api.ipify.org?format=json')
             .then(response => response.json())
             .then(data => {
@@ -256,12 +275,12 @@
 
         let physicsLoops = [];
 
-        // Engine that drops windows on screen with unique animation scales and audio beats
+        // Engine that drops windows on screen with native animations and audio triggers
         function spawnWindow(data, index) {
-            // Play error sound cleanly on launch using your specific filename
+            // Instant Audio Trigger: Fired immediately at start of calculation
             const audio = new Audio('windows-11-error-sound.mp3');
-            audio.volume = 0.8;
-            audio.play().catch(e => console.log("Audio play blocked until interaction."));
+            audio.volume = 0.85;
+            audio.play().catch(e => console.log("Interaction required for sound."));
 
             const win = document.createElement('div');
             win.className = 'win11-window';
@@ -288,10 +307,10 @@
 
             factory.appendChild(win);
 
-            let dx = (index % 2 === 0 ? 4 : -4) + (index * 0.4);
-            let dy = (index % 3 === 0 ? 3 : -3) - (index * 0.4);
+            // SPEED UPGRADE: Velocity values increased for quick erratic movement patterns
+            let dx = (index % 2 === 0 ? 8 : -8) + (index * 0.6);
+            let dy = (index % 3 === 0 ? 6 : -6) - (index * 0.6);
 
-            // Bouncing logic runs perfectly alongside animation scaling
             const interval = setInterval(() => {
                 posX += dx;
                 posY += dy;
@@ -304,6 +323,16 @@
             }, 16);
 
             physicsLoops.push(interval);
+
+            // Win11 Custom Close Animation Attachment
+            const closeElements = win.querySelectorAll('.close-btn, .win11-action-btn');
+            closeElements.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    clearInterval(interval);
+                    win.classList.add('win11-closing');
+                    setTimeout(() => win.remove(), 150);
+                });
+            });
         }
 
         // --- TRIGGER SECTOR ---
@@ -335,12 +364,10 @@
 
             let progress = 0;
 
-            // Ticking speed is slowed down to give the windows more screen-time before blacking out
             const liveCounter = setInterval(() => {
                 progress += 1;
                 document.getElementById('countdown').textContent = `[ PURGING VOLUMES: ${progress}% ]`;
                 
-                // Stagger out the animated sound windows across the timeline
                 if (progress === 8) spawnWindow(errorTemplates[0], 0);
                 if (progress === 18) spawnWindow(errorTemplates[1], 1);
                 if (progress === 28) spawnWindow(errorTemplates[2], 2);
