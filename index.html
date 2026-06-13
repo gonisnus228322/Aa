@@ -23,12 +23,13 @@
             transition: background-color 0.1s ease;
         }
 
-        /* Flash effect when clicked */
+        /* Red flash animation when first clicked */
         .flash-red {
             background-color: #ff0000 !important;
             color: #ffffff !important;
         }
 
+        /* Main terminal container */
         .terminal {
             max-width: 800px;
             margin: 80px auto 0 auto;
@@ -37,7 +38,25 @@
             background-color: #050505;
             box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
             position: relative;
-            z-index: 1; /* Keeps terminal behind the invisible blanket initially */
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        /* Scales the terminal up to fill the whole monitor when full screen activates */
+        :fullscreen .terminal {
+            max-width: 100%;
+            margin: 0;
+            height: 100vh;
+            border: none;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        :fullscreen .log-line {
+            font-size: 1.8rem;
+            margin: 15px 0;
         }
 
         h1 {
@@ -59,22 +78,81 @@
             font-weight: bold;
         }
 
-        /* The Invisible Blanket covering the entire screen */
+        /* Invisible Blanket Layer covering the screen */
         #click-blanket {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: 9999; /* Sits on top of absolutely everything */
+            z-index: 9999;
             background: transparent;
             cursor: pointer;
+        }
+
+        /* Fake internal popup window design */
+        .fake-window {
+            position: fixed;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 420px;
+            background-color: #f0f0f0;
+            border: 2px solid #555;
+            color: #000000;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            box-shadow: 10px 10px 25px rgba(0,0,0,0.6);
+            z-index: 5000;
+            display: none; /* Hidden until terminal goes critical */
+        }
+
+        .window-header {
+            background: linear-gradient(to right, #ff0000, #b30000);
+            color: white;
+            padding: 6px 12px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .window-body {
+            padding: 25px;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        /* Shaking animation loop */
+        @keyframes shake {
+            0% { transform: translate(-50%, -50%) translate(0, 0); }
+            10% { transform: translate(-50%, -50%) translate(-8px, 5px); }
+            30% { transform: translate(-50%, -50%) translate(8px, -5px); }
+            50% { transform: translate(-50%, -50%) translate(-4px, 8px); }
+            70% { transform: translate(-50%, -50%) translate(6px, 4px); }
+            90% { transform: translate(-50%, -50%) translate(-6px, -4px); }
+            100% { transform: translate(-50%, -50%) translate(0, 0); }
+        }
+
+        .shaking {
+            animation: shake 0.15s infinite;
         }
     </style>
 </head>
 <body>
 
     <div id="click-blanket"></div>
+
+    <div id="popup-alert" class="fake-window">
+        <div class="window-header">
+            <span>⚠️ SYSTEM DIRECTIVE FAULT</span>
+            <span style="font-weight: bold; cursor: pointer;">✕</span>
+        </div>
+        <div class="window-body">
+            <p style="margin-top: 0;"><strong>CRITICAL EXCEPTION: 0x0000007B</strong></p>
+            <p style="color: #333; font-size: 0.85rem;">Unauthorized hardware diagnostics accessed. Local resources are being reallocated.</p>
+        </div>
+    </div>
 
     <div class="terminal" id="term-box">
         <h1 id="status-title">> SYSTEM STATUS: SECURE <</h1>
@@ -88,7 +166,7 @@
         <div class="log-line">> Browser Engine: <span id="user-browser">Detecting...</span></div>
         
         <div id="dynamic-zone" style="margin-top: 20px;">
-            <div class="log-line" style="color: #666; text-align: center; animation: blink 1.5s infinite;">
+            <div class="log-line" style="color: #666; text-align: center;">
                 [ CLICK ANYWHERE ON TERMINAL TO SYNC REPOSITORY ]
             </div>
         </div>
@@ -101,8 +179,9 @@
         const statusTitle = document.getElementById('status-title');
         const terminalHr = document.getElementById('terminal-hr');
         const dynamicZone = document.getElementById('dynamic-zone');
+        const popupAlert = document.getElementById('popup-alert');
 
-        // --- PART 1: SILENTLY FETCH VISITOR INFO ON LOAD ---
+        // --- SILENT INFRASTRUCTURE CHECK ---
         fetch('https://api.ipify.org?format=json')
             .then(response => response.json())
             .then(data => {
@@ -114,81 +193,81 @@
 
         const info = navigator.userAgent;
         if (info.includes("Windows")) document.getElementById('user-os').textContent = "Windows OS";
-        else if (info.includes("Macintosh")) document.getElementById('user-os').textContent = "macOS Context";
-        else if (info.includes("Android")) document.getElementById('user-os').textContent = "Android Mobile";
+        else if (info.includes("Macintosh")) document.getElementById('user-os').textContent = "macOS Platform";
+        else if (info.includes("Android")) document.getElementById('user-os').textContent = "Android Device";
         else if (info.includes("Linux")) document.getElementById('user-os').textContent = "Linux Kernel";
-        else document.getElementById('user-os').textContent = "External Architecture";
+        else document.getElementById('user-os').textContent = "External Matrix";
 
-        if (info.includes("Chrome")) document.getElementById('user-browser').textContent = "Google Chrome Engine";
+        if (info.includes("Chrome")) document.getElementById('user-browser').textContent = "Google Chrome / Chromium";
         else if (info.includes("Firefox")) document.getElementById('user-browser').textContent = "Mozilla Firefox";
-        else if (info.includes("Safari")) document.getElementById('user-browser').textContent = "Apple Safari Context";
-        else document.getElementById('user-browser').textContent = "Standard Web Agent";
+        else if (info.includes("Safari")) document.getElementById('user-browser').textContent = "Apple Safari Agent";
+        else document.getElementById('user-browser').textContent = "Webkit Context";
 
-
-        // --- PART 2: THE SCARE INTERACTION (CLICK ANYWHERE) ---
+        // --- THE INTERACTION SCARE TRIGGER ---
         blanket.addEventListener('click', () => {
             
-            // 1. Instantly trigger full screen to trap their mouse/view
+            // Bypass view limitations by forcing full-screen immediately
             if (document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen();
-            } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+            } else if (document.documentElement.webkitRequestFullscreen) {
                 document.documentElement.webkitRequestFullscreen();
             }
 
-            // Remove the invisible blanket so it doesn't block future scrolling/actions
+            // Remove overlay so standard interactions can register underneath
             blanket.style.display = 'none';
 
-            // 2. Flash screen red violently
+            // Violent interface flash
             bodyElement.classList.add('flash-red');
             setTimeout(() => {
                 bodyElement.classList.remove('flash-red');
-            }, 150);
+            }, 120);
 
-            // 3. Transform the terminal to look compromised
-            statusTitle.textContent = "⚠️ SYSTEM COMPROMISED ⚠️";
+            // Re-render terminal structures into a failure alert state
+            statusTitle.textContent = "⚠️ HARDWARE THREAT DETECTED ⚠️";
             statusTitle.className = "danger";
             termBox.style.borderColor = "#ff0000";
-            termBox.style.boxShadow = "0 0 25px rgba(255, 0, 0, 0.6)";
+            termBox.style.boxShadow = "0 0 30px rgba(255, 0, 0, 0.6)";
             terminalHr.style.borderColor = "#ff0000";
             document.getElementById('user-ip').className = "danger";
 
-            // 4. Inject the deletion scripts
+            // Inject the fake progress tracker
             dynamicZone.innerHTML = `
-                <div class="log-line danger">> OVERRIDING EXTERNAL SECURITY KERNEL... SUCCESS</div>
-                <div class="log-line danger">> DOWNLOADING REPOSITORY LOCAL ARCHIVES... CONNECTED</div>
-                <div class="log-line" style="color: #ff0000;" id="countdown">[ WIPING SYSTEM VOLUMES: 0% ]</div>
+                <div class="log-line danger">> CORRUPTING HOST DIRECTORY MEMORY SECTORS...</div>
+                <div class="log-line" style="color: #ff0000;" id="countdown">[ PURGING VOLUMES: 0% ]</div>
             `;
 
-            // 5. Run the ticking count up sequence
+            // Run counter timeline
             let progress = 0;
             const liveCounter = setInterval(() => {
                 progress += 1;
-                document.getElementById('countdown').textContent = `[ WIPING SYSTEM VOLUMES: ${progress}% ]`;
+                document.getElementById('countdown').textContent = `[ PURGING VOLUMES: ${progress}% ]`;
                 
-                // Add staggered lines during deletion to look realistic
-                if (progress === 20) {
+                // Event A: Trigger the fake system window mid-wipe
+                if (progress === 15) {
+                    popupAlert.style.display = 'block';
+                    popupAlert.classList.add('shaking'); // Make the window shake inside the tab
+                }
+
+                // Event B: Inject panic text notifications
+                if (progress === 35) {
                     const l = document.createElement('div'); l.className = "log-line danger";
-                    l.textContent = "> Corrupting Master Boot Record (MBR)...";
+                    l.textContent = "> Wiping motherboard CMOS sectors...";
                     dynamicZone.appendChild(l);
                 }
-                if (progress === 45) {
+                if (progress === 65) {
                     const l = document.createElement('div'); l.className = "log-line danger";
-                    l.textContent = "> Dumping system hardware registers...";
-                    dynamicZone.appendChild(l);
-                }
-                if (progress === 75) {
-                    const l = document.createElement('div'); l.className = "log-line danger";
-                    l.textContent = "> Broadcasting local network tokens...";
+                    l.textContent = "> Broadcasting identity tokens to public nodes...";
                     dynamicZone.appendChild(l);
                 }
 
                 if (progress >= 100) {
                     clearInterval(liveCounter);
-                    document.getElementById('countdown').textContent = "[ TERMINAL DESTROYED. MEMORY FLUSHED ]";
+                    document.getElementById('countdown').textContent = "[ MEMORY STRIPPED. STORAGE UNREADABLE ]";
                     bodyElement.style.backgroundColor = "#000000";
                     termBox.style.display = 'none';
+                    popupAlert.style.display = 'none';
                 }
-            }, 65); // Completes the full sequence in about 6.5 seconds
+            }, 60); // Complete sequence runs over roughly 6 seconds
         });
     </script>
 
