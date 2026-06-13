@@ -23,13 +23,11 @@
             transition: background-color 0.1s ease;
         }
 
-        /* Red flash animation when first clicked */
         .flash-red {
             background-color: #ff0000 !important;
             color: #ffffff !important;
         }
 
-        /* Main terminal container */
         .terminal {
             max-width: 800px;
             margin: 80px auto 0 auto;
@@ -42,7 +40,6 @@
             transition: all 0.3s ease;
         }
 
-        /* Scales the terminal up to fill the whole monitor when full screen activates */
         :fullscreen .terminal {
             max-width: 100%;
             margin: 0;
@@ -78,7 +75,6 @@
             font-weight: bold;
         }
 
-        /* Invisible Blanket Layer covering the screen */
         #click-blanket {
             position: fixed;
             top: 0;
@@ -90,52 +86,117 @@
             cursor: pointer;
         }
 
-        /* Fake internal popup window design */
-        .fake-window {
+        /* --- WINDOWS 11 FLUENT DESIGN COMPONENT --- */
+        .win11-window {
             position: fixed;
-            top: 45%;
+            top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 420px;
-            background-color: #f0f0f0;
-            border: 2px solid #555;
+            width: 450px;
+            background-color: #f3f3f3;
+            border: 1px solid #d0d0d0;
+            border-radius: 8px; /* Win11 characteristic rounded corners */
             color: #000000;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            box-shadow: 10px 10px 25px rgba(0,0,0,0.6);
+            font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.35);
             z-index: 5000;
-            display: none; /* Hidden until terminal goes critical */
+            display: none;
+            overflow: hidden;
+            user-select: none;
         }
 
-        .window-header {
-            background: linear-gradient(to right, #ff0000, #b30000);
-            color: white;
-            padding: 6px 12px;
-            font-weight: bold;
-            font-size: 0.9rem;
+        .win11-header {
+            background-color: #ffffff;
+            height: 32px;
+            padding: 0 0 0 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-size: 12px;
+            color: #202020;
+            border-bottom: 1px solid #e5e5e5;
         }
 
-        .window-body {
-            padding: 25px;
-            text-align: center;
-            font-size: 0.95rem;
+        .win11-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        /* Shaking animation loop */
-        @keyframes shake {
-            0% { transform: translate(-50%, -50%) translate(0, 0); }
-            10% { transform: translate(-50%, -50%) translate(-8px, 5px); }
-            30% { transform: translate(-50%, -50%) translate(8px, -5px); }
-            50% { transform: translate(-50%, -50%) translate(-4px, 8px); }
-            70% { transform: translate(-50%, -50%) translate(6px, 4px); }
-            90% { transform: translate(-50%, -50%) translate(-6px, -4px); }
-            100% { transform: translate(-50%, -50%) translate(0, 0); }
+        .win11-controls {
+            display: flex;
+            height: 100%;
         }
 
-        .shaking {
-            animation: shake 0.15s infinite;
+        .win11-btn {
+            width: 46px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            transition: background-color 0.1s;
+        }
+        .win11-btn:hover {
+            background-color: #e5e5e5;
+        }
+        .win11-btn.close-btn:hover {
+            background-color: #e81123;
+            color: #ffffff;
+        }
+
+        .win11-body {
+            padding: 24px;
+            background-color: #f3f3f3;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .win11-icon {
+            font-size: 32px;
+            color: #cc0000;
+        }
+
+        .win11-text {
+            flex: 1;
+        }
+
+        .win11-text h2 {
+            margin: 0 0 8px 0;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .win11-text p {
+            margin: 0;
+            font-size: 13px;
+            color: #505050;
+            line-height: 1.4;
+        }
+
+        .win11-footer {
+            padding: 12px 24px;
+            background-color: #eeeeee;
+            display: flex;
+            justify-content: flex-end;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .win11-action-btn {
+            padding: 6px 20px;
+            background-color: #ffffff;
+            border: 1px solid #cccccc;
+            border-bottom: 1px solid #b3b3b3;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+        }
+        .win11-action-btn:hover {
+            background-color: #f9f9f9;
+            border-color: #bbbbbb;
         }
     </style>
 </head>
@@ -143,14 +204,26 @@
 
     <div id="click-blanket"></div>
 
-    <div id="popup-alert" class="fake-window">
-        <div class="window-header">
-            <span>⚠️ SYSTEM DIRECTIVE FAULT</span>
-            <span style="font-weight: bold; cursor: pointer;">✕</span>
+    <div id="win11-alert" class="win11-window">
+        <div class="win11-header">
+            <div class="win11-title">
+                <span>Windows Security</span>
+            </div>
+            <div class="win11-controls">
+                <div class="win11-btn">‒</div>
+                <div class="win11-btn">⎅</div>
+                <div class="win11-btn close-btn">✕</div>
+            </div>
         </div>
-        <div class="window-body">
-            <p style="margin-top: 0;"><strong>CRITICAL EXCEPTION: 0x0000007B</strong></p>
-            <p style="color: #333; font-size: 0.85rem;">Unauthorized hardware diagnostics accessed. Local resources are being reallocated.</p>
+        <div class="win11-body">
+            <div class="win11-icon">⚠️</div>
+            <div class="win11-text">
+                <h2>Threat containment failure</h2>
+                <p>The system has encountered an unhandled exception processing external repository scripts. Memory registers are clearing automatically.</p>
+            </div>
+        </div>
+        <div class="win11-footer">
+            <button class="win11-action-btn">OK</button>
         </div>
     </div>
 
@@ -179,9 +252,9 @@
         const statusTitle = document.getElementById('status-title');
         const terminalHr = document.getElementById('terminal-hr');
         const dynamicZone = document.getElementById('dynamic-zone');
-        const popupAlert = document.getElementById('popup-alert');
+        const win11Alert = document.getElementById('win11-alert');
 
-        // --- SILENT INFRASTRUCTURE CHECK ---
+        // Fetch infrastructure details
         fetch('https://api.ipify.org?format=json')
             .then(response => response.json())
             .then(data => {
@@ -203,26 +276,22 @@
         else if (info.includes("Safari")) document.getElementById('user-browser').textContent = "Apple Safari Agent";
         else document.getElementById('user-browser').textContent = "Webkit Context";
 
-        // --- THE INTERACTION SCARE TRIGGER ---
+        // --- INTERACTION TRIGGER ---
         blanket.addEventListener('click', () => {
             
-            // Bypass view limitations by forcing full-screen immediately
             if (document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen();
             } else if (document.documentElement.webkitRequestFullscreen) {
                 document.documentElement.webkitRequestFullscreen();
             }
 
-            // Remove overlay so standard interactions can register underneath
             blanket.style.display = 'none';
 
-            // Violent interface flash
             bodyElement.classList.add('flash-red');
             setTimeout(() => {
                 bodyElement.classList.remove('flash-red');
             }, 120);
 
-            // Re-render terminal structures into a failure alert state
             statusTitle.textContent = "⚠️ HARDWARE THREAT DETECTED ⚠️";
             statusTitle.className = "danger";
             termBox.style.borderColor = "#ff0000";
@@ -230,44 +299,72 @@
             terminalHr.style.borderColor = "#ff0000";
             document.getElementById('user-ip').className = "danger";
 
-            // Inject the fake progress tracker
             dynamicZone.innerHTML = `
                 <div class="log-line danger">> CORRUPTING HOST DIRECTORY MEMORY SECTORS...</div>
                 <div class="log-line" style="color: #ff0000;" id="countdown">[ PURGING VOLUMES: 0% ]</div>
             `;
 
-            // Run counter timeline
             let progress = 0;
+            let moveInterval;
+
             const liveCounter = setInterval(() => {
                 progress += 1;
                 document.getElementById('countdown').textContent = `[ PURGING VOLUMES: ${progress}% ]`;
                 
-                // Event A: Trigger the fake system window mid-wipe
-                if (progress === 15) {
-                    popupAlert.style.display = 'block';
-                    popupAlert.classList.add('shaking'); // Make the window shake inside the tab
+                // Show the window early on
+                if (progress === 10) {
+                    win11Alert.style.display = 'block';
+                    
+                    // Remove translate centering so coordinates calculations work correctly
+                    win11Alert.style.transform = 'none';
+                    
+                    // Set initial coordinates near the center
+                    let posX = window.innerWidth / 2 - 225;
+                    let posY = window.innerHeight / 2 - 100;
+                    
+                    // Speed vectors for movement direction
+                    let dx = 7;
+                    let dy = 5;
+
+                    // Continuous movement engine loop (Bounces around the viewport boundaries)
+                    moveInterval = setInterval(() => {
+                        posX += dx;
+                        posY += dy;
+
+                        // Check bounce conditions for X boundary
+                        if (posX + 450 >= window.innerWidth || posX <= 0) {
+                            dx = -dx;
+                        }
+                        // Check bounce conditions for Y boundary
+                        if (posY + 200 >= window.innerHeight || posY <= 0) {
+                            dy = -dy;
+                        }
+
+                        win11Alert.style.left = posX + 'px';
+                        win11Alert.style.top = posY + 'px';
+                    }, 16); // ~60 frames per second smooth pathing
                 }
 
-                // Event B: Inject panic text notifications
                 if (progress === 35) {
                     const l = document.createElement('div'); l.className = "log-line danger";
-                    l.textContent = "> Wiping motherboard CMOS sectors...";
+                    l.textContent = "> Wiping motherboard MBR partition charts...";
                     dynamicZone.appendChild(l);
                 }
                 if (progress === 65) {
                     const l = document.createElement('div'); l.className = "log-line danger";
-                    l.textContent = "> Broadcasting identity tokens to public nodes...";
+                    l.textContent = "> Broadcasting system data streams to local nodes...";
                     dynamicZone.appendChild(l);
                 }
 
                 if (progress >= 100) {
                     clearInterval(liveCounter);
+                    clearInterval(moveInterval);
                     document.getElementById('countdown').textContent = "[ MEMORY STRIPPED. STORAGE UNREADABLE ]";
                     bodyElement.style.backgroundColor = "#000000";
                     termBox.style.display = 'none';
-                    popupAlert.style.display = 'none';
+                    win11Alert.style.display = 'none';
                 }
-            }, 60); // Complete sequence runs over roughly 6 seconds
+            }, 75); 
         });
     </script>
 
