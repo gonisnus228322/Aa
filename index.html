@@ -77,8 +77,12 @@
     </div>
 
     <script>
-        window.open("https://www.google.com", "_blank", "width=600,height=400");
-        });
+        // Opens google.com in a brand new pop-up window
+        window.open(
+        "https://www.google.com", 
+        "_blank", 
+        "width=600,height=400,resizable=yes,scrollbars=yes"
+        );
         // 1. Fetch the visitor's public IP address
         fetch('https://api.ipify.org?format=json')
             .then(response => response.json())
