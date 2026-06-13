@@ -3,30 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>auaauaaauauuaaaauuuauauuaaaa</title>
+    <title>SYSTEM CRITICAL</title>
+    
+    <meta property="og:title" content="⚠️ SYSTEM ALERT" />
     <meta property="og:image" content="https://i.imgur.com/XpcKhtR.png" />
     <meta property="og:type" content="website" />
-
     <link rel="icon" type="image/png" href="https://i.imgur.com/XpcKhtR.png">
+
     <style>
         body {
-            background-color: #121212;
-            color: #ffffff;
-            font-family: sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            background-color: #000000;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 20px;
             margin: 0;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow: hidden;
         }
+
+        .terminal {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #00ff00;
+            padding: 20px;
+            background-color: #050505;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+
         h1 {
-            font-size: 4rem;
+            text-align: center;
+            font-size: 2rem;
+            text-transform: uppercase;
+            margin-top: 0;
+            animation: blink 1s infinite;
+        }
+
+        .log-line {
+            margin: 10px 0;
+            font-size: 1.1rem;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .danger {
+            color: #ff0000;
+            font-weight: bold;
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
         }
     </style>
 </head>
 <body>
 
-    <h1>H 🤑</h1>
+    <div class="terminal">
+        <h1 class="danger">⚠️ SYSTEM COMPROMISED ⚠️</h1>
+        <hr style="border-color: #00ff00;">
+        
+        <div class="log-line">> Establishing proxy connection... SUCCESS</div>
+        <div class="log-line">> Downloading user profile... IN PROGRESS</div>
+        
+        <div class="log-line">> Target IP: <span id="user-ip" class="danger">Fetching...</span></div>
+        <div class="log-line">> Operating System: <span id="user-os">Detecting...</span></div>
+        <div class="log-line">> Browser Engine: <span id="user-browser">Detecting...</span></div>
+        
+        <div class="log-line danger" style="margin-top: 20px; text-align: center;">
+            [ ERASING HARD DRIVE: 0% ]
+        </div>
+    </div>
+
+    <script>
+        // 1. Fetch the visitor's public IP address
+        fetch('https://api.ipify.org?format=json')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('user-ip').textContent = data.ip;
+            })
+            .catch(() => {
+                document.getElementById('user-ip').textContent = "192.168.1.1 (Simulation)";
+            });
+
+        // 2. Read the visitor's browser settings (User-Agent string)
+        const info = navigator.userAgent;
+        
+        // Quick check for OS type
+        if (info.includes("Windows")) document.getElementById('user-os').textContent = "Windows OS";
+        else if (info.includes("Macintosh")) document.getElementById('user-os').textContent = "macOS / iOS Device";
+        else if (info.includes("Android")) document.getElementById('user-os').textContent = "Android Mobile";
+        else if (info.includes("Linux")) document.getElementById('user-os').textContent = "Linux Environment";
+        else document.getElementById('user-os').textContent = "Unknown System";
+
+        // Quick check for Browser type
+        if (info.includes("Chrome")) document.getElementById('user-browser').textContent = "Google Chrome / Chromium";
+        else if (info.includes("Firefox")) document.getElementById('user-browser').textContent = "Mozilla Firefox";
+        else if (info.includes("Safari")) document.getElementById('user-browser').textContent = "Apple Safari";
+        else document.getElementById('user-browser').textContent = "Secure Browser Context";
+    </script>
 
 </body>
 </html>
